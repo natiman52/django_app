@@ -1,0 +1,12 @@
+{%extends "base.html" %}
+
+{%block content%}
+{%for mess in messages%}
+ {{mess}}
+{%endfor%}
+<form class="" action="{%url 'Destroy' %}" method="post">
+{%csrf_token%}
+  {{form}}
+  <button name="button">Delete</button>
+</form>
+{%endblock%}

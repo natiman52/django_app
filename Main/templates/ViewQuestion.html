@@ -1,0 +1,376 @@
+{%extends 'base.html'%}
+
+{%block title%}{{ques.question_title}}{%endblock%}
+{%block content%}
+{%load crispy_forms_tags%}
+{% load poll_extras %}
+{%load widget_tweaks%}
+{%include 'profile navbar copy.html'%}
+<script src="https://kit.fontawesome.com/7ce95a93f1.js" crossorigin="anonymous"></script>
+<div style="margin-top:1%;" class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2 colored">
+            <div class="row try" >
+                <div class="col-2 d-flex align-content-center justify-content-center try3" >
+                   <a href="{%url 'main:home' %}"><i class="fas fa-angle-double-left"></i> ዋና ገጽ</a>
+                </div>
+                <div class="col-10 d-flex align-items-center try2" >
+                    {{ques.question_title}}
+                </div>
+            </div>
+            <div style="background-color: white; padding: 10px;margin-top:15px;border-radius: 3px;">
+            <div class=" mr-4" style="display: flex;justify-content: space-between;align-items: center;">
+                <div style="margin-left:14px;">
+                    {%if request.user == ques.author%}
+                    <ul class="nav nav-pills">
+                        <li class="mr-3"><a class="red" href="{%url 'main:delete_question' slug=ques.slug %}"><i class="far fa-trash-alt"></i></a></li>
+                        <li class="mr-3"><a href="{%url 'main:update_question' slug=ques.slug%}"><i class="fas fa-pencil-alt"></i></a></li>
+
+                    </ul>
+                    {%endif%}
+                </div>
+                <div>
+                    <img class="img-circle image" src="{{ques.author.profile.profile_pic.url}}" alt="">&nbsp;&nbsp;<a style='font-size:large;' href="{%url 'show_profile' username=ques.author.username %}"><strong>{{ques.author}}</strong></a>
+                </div>
+            </div>
+            <div class="try4 mr-4" style="overflow: auto;border-bottom:1px solid #f3f3f3;margin-left:10px;margin-top:10px;margin-bottom: 10px;padding-bottom: 10px;">
+                    {{ques.description |safe}}
+            </div>
+            <div class="d-flex align-items-center justify-content-spacebetween mr-4" style="margin-left: 0.9%;">
+            <i class="far fa-calendar"></i>&nbsp; {{ques.date}}
+            <i style="margin-left:10%" class="far fa-comments"></i>&nbsp; {{anws.count}} መልሶች
+            <i style="margin-left:10%" class="far fa-comments"></i>&nbsp; {{ques.views}} እይታዎች
+
+            </div>
+        </div>
+        <div style="background-color: white; padding: 10px;margin-top:15px;border-radius: 3px;">
+            <div style="border-bottom:2px solid #e6e3e3">
+                {%if anws.count > 1 %}
+                <h2>{{anws.count}} መልሶች</h2>
+                {%else%}
+                <h2>{{anws.count}} መልስ</h2>
+                {%endif%}
+            </div>
+            {%for anw in anws%}
+           <div style="margin-top:5px;padding-bottom:10px;border-bottom: 2px solid rgb(204, 204, 204);border-width: 100%;">
+                <div class="row" style="margin:1% 0 3% 0">
+                    <div class=" col-2" >
+                    <div class="col d-flex justify-content-center">
+                    <img class="img-circle image2 lock"  src="{{anw.user.profile.profile_pic.url}}" alt="">
+                    </div>
+                    </div>
+                    <div class="col-10 d-flex align-items-center" style="padding: 5px;justify-content: space-between;">
+                        <div class="answer">
+                        <a class="user" href="">{{anw.user.username}}</a>
+                        <p>የተመለሰበት  ቀን, {{anw.date}}</p>
+                        </div>
+                        <div>
+                            {%if request.user == anw.user%}
+                            <div>
+                                <ul class='nav nav-pills'>
+                                    <li class="mr-3"><a class="red delete{{anw.id}}"  href="{%url 'main:delete_answer' id=anw.id %}"><i class="far fa-trash-alt"></i></a></li>
+                                    <li><a href="{%url 'main:update_answer' id=anw.id %}"><i class="fas fa-pencil-alt"></i></a></li>
+
+                                </ul>
+                            </div>
+                            <script>
+                              $(document).ready(function(){
+                                $('.delete{{anw.id}}').click(function(e){
+                                  e.preventDefault();
+                                  var href = '{%url "main:delete_answer" id=anw.id %}';
+                                  $.ajax({
+                                    method:"GET",
+                                    url:href,
+                                    data:{id:'{{anw.id}}'},
+                                    success:function(){
+                                      window.location.reload()
+                                    },
+                                    error:function(){
+                                      console.log('wrong')
+                                    }
+
+                                  })
+
+                                })
+                              })
+                            </script>
+                            {%elif request.user == ques.author%}
+                            <div>
+                                <ul class='nav nav-pills'>
+                                    <li class="mr-3"><a class="red" href="{%url 'main:delete_answer' id=anw.id %}"><i class="far fa-trash-alt"></i></a></li>
+                                </ul>
+                            </div>
+                            {%endif%}
+                        </div>
+                    </div>
+                </div>
+                <div class="offset-2">
+                     {{anw.Answer |safe}}
+
+                    <div class="d-flex" style="margin-top:10px;">
+                      {%if not anw.user == request.user and user.is_authenticated%}
+                        <div class="mr-4">
+                           <form class="{{anw.id |LikeClass}}" action="" method="POST">{%csrf_token%}
+                               <input class="{{anw.id |hidClass}}" name="{{anw.id |hidClass}}" type="hidden" value="{{anw.id}}">
+                               {%if user in anw.dislike.all%}
+                            <button type="button" disabled>ወድጀዋለሁ {{anw.likes.all.count}}</button>
+                                {%else%}
+                               <button>ወድጀዋለሁ {{anw.likes.all.count}}</button>
+                               {%endif%}
+                           </form>
+                        <script>
+                            $(document).ready(
+                                function(){
+                                    $('.{{anw.id |LikeClass}}').submit(function(e){
+                                        e.preventDefault()
+                                        var id =$('.{{ anw.id | hidClass }}').attr('value')
+                                        $.ajax({
+                                            type: 'POST',
+                                            url:"{%url 'main:like'%}",
+                                            data:{"{{anw.id |hidClass}}" :id,'csrfmiddlewaretoken': "{{csrf_token}}" },
+                                            success:function(){
+                                                window.location.reload()
+                                            },
+                                            error:function(e){
+                                                console.log(e)
+                                            }
+                                        })
+                                    })
+                                }
+                            )
+                        </script>
+                        </div>
+                        <div class="mr-4">
+                            <form class="{{anw.id|DisClass}}" action="">
+                              <input class="{{anw.id |hidClass2}}" name="{{anw.id |hidClass2}}" type="hidden" value="{{anw.id}}">
+                              {%if user in anw.likes.all%}
+                              <button type="button" disabled>አልወደድኩትም {{anw.dislike.all.count}}</button>
+                              {%else%}
+                              <button> አልወደድኩትም {{anw.dislike.all.count}}</button>
+                              {%endif%}
+                            </form>
+                        <script>
+                            $(document).ready(
+                                function(){
+                                    $('.{{anw.id | DisClass}}').submit(
+                                        function(e){
+                                            e.preventDefault()
+                                            var id = $('.{{anw.id |hidClass2}}').attr('value')
+                                            $.ajax({
+                                                type: 'POST',
+                                                url: "{%url 'main:dislike'%}",
+                                                data: { "{{anw.id |hidClass2}}": id, 'csrfmiddlewaretoken': "{{csrf_token}}" },
+                                                success: function () {
+                                                    window.location.reload()
+                                                },
+                                                error: function (e) {
+                                                    console.log(e)
+                                                }
+                                            })
+                                        }
+                                    )
+                                }
+                            )
+
+                        </script>
+                        </div>
+                        {%endif%}
+                        <div class="comm">
+                            <p id="{{anw.id |Slug }}" style="cursor: pointer;"><i class="fas fa-reply"></i> <i style="cursor: pointer;">አስተያየቶች ({{anw.GetCount}})</i></p>
+                        </div>
+                    </div>
+
+                    <form class="{{anw.id |Class}}" style="display:none;" id='someforall{{anw.id}}' data-url="{%url 'main:comment'%}" method="POST">{%csrf_token%}
+                   <div class="container-fluid" style="border-bottom:1px solid  rgb(187, 187, 187);margin-bottom: 2%;">
+                     {%for com in anw.GetComment%}
+                     <div style="border-top:1px solid rgb(187, 187, 187);padding:5px;">
+                         <div class="row">
+                             <div class="col-2">
+                                 <div class="d-flex justify-content-center">
+                                     <img style="width:70px;height: 70px;" src="{{com.user.profile.profile_pic.url}}" alt="">
+                                 </div>
+                                 <div class="d-flex justify-content-center">
+                                     {{com.user.username}}
+                                 </div>
+                             </div>
+                              <div class="col-9" style="padding-right: 5px;padding-left: 5px;display: flex;justify-content: space-between;">
+                                <div style="margin-top:1% ;">
+                                 <div style="color: #000000;margin-top:4% ;">
+                                     {{com.comment}}
+                                 </div>
+                                 <div style="color:#6f7d95;font-size: 12px;margin-top: 11%;">
+                                     {{com.date |date:'d-m-Y'}}
+                                 </div>
+                                </div>
+                                {%if user == com.user%}
+                                <div style="margin-top: 2.5%;">
+                                    <ul class="nav nav-pills">
+                                    <li class="mr-3"><a class="red" href="{%url 'main:delete_comment' id=com.id %}"><i class="far fa-trash-alt"></i></a></li>
+                                    </ul>
+                                </div>
+                                {%endif%}
+                             </div>
+                         </div>
+                     </div>
+                    {%endfor%}
+                </div>
+                {%if not anw.user == request.user and user.is_authenticated%}
+                        <label for="">Comment</label>
+                        <form class="" action="index.html" method="post">
+                          <textarea name="{{anw.id}}" class="form-control {{anw.id}}"></textarea>
+                          <input type="hidden" class="comm{{anw.id}}" name='comm{{anw.id}}' value="{{anw.id}}">
+                          <button class="btn btn-primary" style="margin-top: 1%;">ልጠፍ</button>
+                        </form>
+                {%endif%}
+                    </form>
+                    <script>
+                      document.getElementById('{{anw.id |Slug}}').addEventListener("click",function(){
+                        console.log('hellp')
+                        $('.class{{anw.id}}').toggle()
+                      })
+                    </script>
+                    <script>
+                          $('.{{anw.id |Class}}').submit(function(e){
+                                e.preventDefault()
+                                var textarea = $('.{{anw.id}}').val()
+                                var id = $('.comm{{anw.id}}').attr('value')
+                                var url =$(this).attr('data-url')
+                                $.ajax({
+                                    type:'POST',
+                                    url: "{% url 'main:comment'%}",
+                                    data:{'{{anw.id}}':textarea,"comm{{anw.id}}": id,'csrfmiddlewaretoken': "{{csrf_token}}"},
+                                    success:function(e){
+                                        window.location.reload()
+                                    },
+                                    error:function(e){
+                                        console.log(e)
+                                    }
+                                })
+                            })
+                    </script>
+                </div>
+           </div>
+           {%endfor%}
+           <div class="d-flex justify-content-center" style="margin-top:20px;">
+             {%if user.is_authenticated%}
+               <form action="{%url 'main:AskAnswer' slug=ques.slug %}" method="POST">{%csrf_token%}
+                   {{form |crispy}}
+                   {{form.media}}
+                   <div class="d-flex justify-content-end">
+                      <button class="btn btn-primary butt{{ques.slug}} ">መልስ</button>
+                   </div>
+               </form>
+               {%else%}
+               <div style="text-align:center;">
+                 <h2><a href="{%url 'users:signup'%}">sign up</a> or <a href="{%url 'users:login'%}">log in</a> to answer a Question</h2>
+               </div>
+               {%endif%}
+               <script type="text/javascript">
+                 $('.butt{{ques.slug}}').click(function(e){
+                   e.preventDefault();
+                   for (var instance in CKEDITOR.instances){
+                     CKEDITOR.instances[instance].updateElement();
+                   }
+                   href ="{%url 'main:AskAnswer' slug=ques.slug %}";
+                   ans =$("textarea#id_Answer").val()
+                   $.ajax({
+                     method:'POST',
+                     url:href,
+                     data:{slug:'{{ques.slug}}',Answer:ans,'csrfmiddlewaretoken': "{{csrf_token}}"},
+                     success:function(){
+                       window.location.reload()
+                     },
+                     error:function(){
+                       console.log('not worked')
+                     }
+                   })
+                 })
+               </script>
+           </div>
+        </div>
+        </div>
+    </div>
+</div>
+{%endblock%}
+{%block css%}
+<style>
+    #rep:active{
+        box-shadow: 5px 0px 5px 0px black;
+    }
+    p{
+        margin-bottom: 0px;
+    }
+    .outer{
+    padding: 20px 20px 10px;
+    box-shadow: 1px 1px 5px 1px #edeeee;
+    background-color: #fff;
+    margin: 0;
+    position: absolute;
+    z-index: 4;
+    width: 290px;
+    top: 40px;
+    left: -120px;
+    border: none;
+    visibility: hidden;
+    border-radius: 3px;
+    }
+    .lock:hover + .outer{
+        visibility: visible;
+    }
+    .answer{
+        font-size:11px;
+        font-weight: 500;
+    }
+    .user:hover{
+        text-decoration: none;
+    }
+    .user{
+        color:#2d6ff7;
+        font-weight: 700;
+        font-size: 16px;
+    }
+    .image2{
+        border:2px solid black;
+        border-radius: 50%;
+        width:70px;
+        height:70px;
+    }
+    .image{
+        width:30px;
+        height:30px;
+    }
+    .try3{
+        padding-top: 25px;
+        padding-bottom: 20px;
+        font-size: small;
+        display: flex;
+        align-items: start;
+        color: blue;
+    }
+    .try3 > a:hover{
+        color:blue;
+        text-decoration:none;
+    }
+    .try2{
+        padding-top: 11px;
+        padding-bottom: 20px;
+        font-size: x-large;
+        font-weight: 600;
+        color:blue;
+    }
+    .try{
+        background-color: white;
+        margin: 2px;
+        margin-top:8px;
+        border-radius: 2px;
+    }
+    .colored{
+        background-color: #f3f3f3;;
+    }
+    .red:hover{
+        color:red;
+    }
+</style>
+{%endblock%}
+{%block javascript%}
+{%endblock%}

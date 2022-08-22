@@ -1,0 +1,267 @@
+{%extends 'base.html'%}
+{%block content%}
+{%load poll_extras%}
+{%include 'profile navbar copy.html'%}
+
+<div class="container-fluid emp-profile">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-center">
+                    <img class="img-circle" style="width: 100%;height: 200px;" src="{{owner.profile.profile_pic.url}}" alt="">
+                </div>
+            <div class='profile-img'>
+                <div class="d-flex justify-content-center file">
+                   <label for="file-input">Change photo</label>  
+                   <input id="file-input" type="file" style="visibility: hidden;" name="" id=""> 
+                </div>           
+            </div>
+            
+            </div>
+            <div id="cursive" class="col-md-12">
+                <div style='display:flex;justify-content:space-between'>
+                    <div style="text-align: center;">
+                        <h2>Followers:</h2>
+                        <h5>{{owner.profile.followers.count}}</h5>
+                    </div>
+                    <div style="text-align: center;">
+                        <h2>likes:</h2>
+                        <h5>{{like_count}}</h5>
+                    </div>
+                </div>
+                <div style='display:flex;justify-content:space-between'>
+                    <div style="text-align: center;">
+                        <h2>Questions:</h2>
+                        <h5>{{ques.count}}</h5>
+                    </div>
+                    <div style="text-align: center;">
+                        <h2>Answered Q:</h2>
+                        <h5>{{answ.count}}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7" style="padding-left: 5%;">
+            <div class="row" style="margin-bottom: 20px;">
+            <div>
+             <h3>{{owner.username}}</h3>
+            <h5 style="color: blue;">{{owner.email}}</h5>  
+             </div> 
+             <div class="ml-auto" style="margin-right: 3%;">
+            {%if user in owner.profile.followers.all%}
+<form class="Form1" action="{%url 'Follow'%}" method="POST" >
+{%csrf_token%}
+  <button id="follow1" name="follow" data='{%url "Follow"%}'  value="{{owner}}" value2="Unfollow" class="btn btn-primary">Unfollow</button>  
+{%elif not user in owner.profile.followers.all%}
+<button id="follow1" name="follow" data='{%url "Follow"%}'  value="{{owner}}" value2="follow" class="btn btn-primary">follow</button>  
+</form>
+{%endif%}
+             </div> 
+            </div>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Question</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="answer-tab" data-toggle="tab" role="tab" aria-controls="answer" aria-selected="false" href="#answer"> Answer</a>
+                </li>
+            </ul>
+
+            <div class="tab-content profile-tab" id="myTabContent">
+                <div style="margin-top: 20px;" class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>User Name</label>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>{{owner.username}}</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Email</label>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>{{owner.email}}</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Job</label>
+                                </div>
+                                <div class="col-md-6" style="overflow: auto;">
+                                    <p>{{owner.profile.job}}</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>bio</label>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>{{owner.profile.bio}}</p>
+                                </div>
+                            </div>
+                </div>
+                <div class="tab-pane fade" style="margin-top: 20px;" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                    <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Answers</th>
+                            <th scope="col">Date</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            {%for que in ques%}
+                          <tr>
+                            <th scope="row">{{que.id}}</th>
+                            <td>{{que.question_title}}</td>
+                            <td style="text-align: center;">{{que |filterAnswer}}</td>
+                            <td>{{que.date}}</td>
+                          </tr>
+                          {%endfor%}
+                        </tbody>
+                      </table>
+                </div>
+                <div class="tab-pane fade" style="margin-top: 20px;" id="answer" role="tabpanel" aria-labelledby="answer-tab">
+                    <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Answered Question title</th>
+                            <th scope="col">likes</th>
+                            <th scope="col">comments</th>
+                            <th scope="col">date</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            {%for ans in answ%}
+                          <tr>
+                            <th scope="row">{{ans.question.id}}</th>
+                            <td>{{ans.question.question_title}}</td>
+                            <td style="text-align: center;">{{ans.likes.count}}</td>
+                            <td style="text-align: center;">{{ans |CommentAnswer}}</td>
+                            <td>{{ans.date}}</td>
+                          </tr>
+                          {%endfor%}
+                        </tbody>
+                      </table>
+                </div>
+        </div>
+    </div>
+</div>
+{%endblock%}
+
+{%block css%}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Cedarville+Cursive&display=swap');
+#cursive{
+    font-family: 'Cedarville Cursive';
+}
+.emp-profile{
+    padding: 2%;
+    padding-right: 1%;
+    padding-left: 1%;
+    border-radius: 0.5rem;
+    background: #fff;
+}
+.profile-img{
+    text-align: end;
+    padding: 14%;
+    padding-left: 0;
+    padding-right: 0;
+    margin-top: -14%;
+}
+.profile-img img{
+    width: 100%;
+    height: 100%;
+}
+.profile-img .file {
+    text-align: center;
+    position: relative;
+    color: white;
+    margin-top: 0%;
+    width: 100%;
+    border: none;
+    border-radius: 0;
+    font-size: 15px;
+    background: #212529b8;
+
+}
+.profile-img .file input {
+    position: absolute;
+    opacity: 0;
+    right: 0;
+    top: 0;
+}
+.profile-head h5{
+    color: #333;
+}
+.profile-head h6{
+    color: #0062cc;
+}
+.profile-edit-btn{
+    border: none;
+    border-radius: 1.5rem;
+    width: 100%;
+    padding: 5%;
+    padding-left: 10px;
+    padding-right:10px ;
+    font-weight: 600;
+    color: #6c757d;
+    cursor: pointer;
+}
+.proile-rating{
+    font-size: 12px;
+    color: #818182;
+    margin-top: 2%;
+    margin-bottom: 1%;
+}
+.proile-rating span{
+    color: #495057;
+    font-size: 15px;
+    font-weight: 600;
+}
+.profile-head .nav-tabs{
+    margin-bottom:5%;
+}
+.profile-head .nav-tabs .nav-link{
+    font-weight:600;
+    border: none;
+}
+.profile-head .nav-tabs .nav-link.active{
+    border: none;
+    border-bottom:2px solid #0062cc;
+}
+.profile-work{
+    padding: 14%;
+    margin-top: -15%;
+}
+.profile-work p{
+    font-size: 12px;
+    color: #818182;
+    font-weight: 600;
+    margin-top: 10%;
+}
+.profile-work a{
+    text-decoration: none;
+    color: #495057;
+    font-weight: 600;
+    font-size: 14px;
+}
+.profile-work ul{
+    list-style: none;
+}
+.profile-tab label{
+    font-weight: 600;
+}
+.profile-tab p{
+    font-weight: 600;
+    color: #0062cc;
+}
+</style>
+{%endblock%}

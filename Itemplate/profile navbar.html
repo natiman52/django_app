@@ -1,0 +1,49 @@
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light" id="logo">
+    <h1 id='ONE' class="navbar-brand" href="#">EductionFlow</h1>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <form style="padding:0;margin:0;" action="{%url 'main:home'%}" method="get">
+        <button class="btn btn-primary" style="border-radius: 5px;">Home</button>
+      </form>
+        <ul class="navbar-nav ml-auto">
+          {%if not user.is_authenticated%}
+          <li class="nav-item ">
+            <a class="nav-link" href="{%url 'users:signup'%}">signup</a>
+          </li>
+          <li class="nav-item ">
+            <a class="nav-link" href="{%url 'users:login'%}">login</a>
+          </li>
+          {%else%}
+        <li class="nav-item ">
+          <a class="nav-link" href="{%url 'users:logout'%}">logout</a>
+        </li>
+        {%endif%}
+      </ul>
+    </div>
+  </nav>
+
+<style>
+    #logo{
+    box-shadow: 0 0 0 5px 0 black;
+    background: rgb(131,58,180);
+    background: linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%);
+}
+@import url('https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@700&display=swap');
+#ONE{
+    font-family: 'Grenze Gotisch', cursive;;
+    font-weight:bold;
+    font-size:larger;
+}
+button{
+    border-radius:10px;
+    padding-left:13px ;
+    padding-right: 13px;
+}
+ul li a{
+    color:black;
+    font-weight: 500;
+}
+</style>

@@ -1,0 +1,41 @@
+<div class="" style="height: 100vh;position: static;width:100%;">
+    <div style="margin-top:40px;">
+            <h6>top Users</h6>
+    </div>
+    {%for boo in boom%}
+        <div class="row">
+            <div class="col-3">
+                <img src="{{boo.profile.profile_pic.url}}" style="width: 50px;height: 50px;border-radius:50px;" alt="">
+            </div>
+            <div class="col-8 d-flex align-items-center">
+                <p style="font-size: x-large;"><a href="{%url 'show_profile' username=boo.username %}">{{boo.username}}</a></p>
+            </div>
+        </div>
+    {%endfor%}
+    {%if user.is_authenticated%}
+    {%if user.follows.count >= 1 %}
+    <div style="margin-top:40px;">
+      <h6>The people you follow</h6>
+    </div>
+    {%for usa in user.follows.all %}
+      <div class="row" >
+        <div class="col-3">
+        <img src="{{usa.profile_pic.url}}" style="width: 50px;height: 50px;" alt="">
+        </div>
+        <div class="col-8 d-flex align-items-center">
+            <p style="font-size: x-large;"><a href="{%url 'show_profile' username=usa.owner.username %}">{{usa.owner.username}}</a></p>
+        </div>
+    </div>
+    {%endfor%}
+    {%endif%}
+    {%endif%}
+</div>
+<style>
+    h6{
+        font-size: large;
+    }
+    p{
+        padding: 0;
+        margin: 0;
+    }
+</style>

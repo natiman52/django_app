@@ -1,0 +1,15 @@
+asgiref==3.2.10
+DateTime==4.3
+Django==3.1
+django-ckeditor==6.0.0
+django-crispy-forms==1.10.0
+django-filter==2.4.0
+django-js-asset==1.2.2
+django-resized==0.3.11
+django-widget-tweaks==1.4.8
+ethiopian-date==1.0
+Pillow==8.1.0
+pytz==2020.5
+six==1.15.0
+sqlparse==0.4.1
+zope.interface==5.2.0

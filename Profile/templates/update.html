@@ -1,0 +1,10 @@
+{%extends 'base.html'%}
+
+{%block content%}
+<form class="" action="{%url 'UpdateProfile'%}" method="POST">{%csrf_token%}
+
+  {{form2}}
+  {{form1}}
+  <button>hello</button>
+</form>
+{%endblock%}

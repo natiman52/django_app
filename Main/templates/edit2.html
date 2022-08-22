@@ -1,0 +1,14 @@
+{%extends 'base.html'%}
+{%block content%}
+{%load crispy_forms_tags%}
+{%include 'profile navbar copy.html'%}
+<div class="container">
+<form class="offset-2 col-8" style="margin-top: 5%;margin-right:3%;" action='' method="POST">{%csrf_token%}
+	{{form |crispy}}
+	{{form.media}}
+	<div>
+	<button class="btn btn-primary">submit</button>
+	</div>
+</form>	
+</div>
+{%endblock%}

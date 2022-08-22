@@ -1,0 +1,156 @@
+{%load poll_extras%}
+<div>
+      {%if user.is_authenticated%}
+      <div class="d-flex justify-content-end">
+        <form action='{%url "main:Question"%}' method="GET">
+          <button  style="margin-top:30px;margin-bottom:15px;" class="btn btn-primary">ጥያቄ ጠይቅ</button>
+        </form>
+      </div>
+      {%endif%}
+     <!-- '{url "main:Ask" }' -->
+    </div>
+<div id="wrapper">
+    {%for al in all%}
+    <div class="wrapper container-fluid" >
+      <div class="row">
+        <div class="col-md-2">
+          <div class="d-flex align-items-center justify-content-center">
+
+            <img class="img-circle" src="{{al.author.profile.profile_pic.url}}" alt="">
+          </div>
+        </div>
+        <div class="col-md-10">
+          <div>
+            <a class="add_view" value_id="{%url 'main:add_view' slug=al.slug %}" href="{%url 'main:List' id=al.slug %}"><h4>{{al.question_title}}</h4></a>
+          </div>
+          <p>{{al.description|safe}}</p>
+          <p>{{al.date}}</p>
+        </div>
+      </div>
+    </div>
+    {%endfor%}
+    </div>
+    {%if paginator.num_pages > 8 %}   
+    <div id="previous_page_add">
+      <a name="url" id="previous_page_add_butt" class="url" value_id="">previous_page</a>
+    </div>
+    {%for i in 9|iltreate_of_num %}
+
+    <a name="url" class="url" id="page_number" value_id="{{i}}">{{i}}</a>
+    {%endfor%}
+    <div class="last_page_add">
+      <a name="url" id="last_page_add_butt" class="last_page url" value_id="2">Next page</a>
+    </div>
+    {% else %}
+    <div class="d-flex justify-content-center ">
+    {%for i in paginator.page_range%}
+    <a style="padding: 3px;margin-bottom: 5px;" name="url" class="url" id="page_number" value_id="{{i}}">{{i}}</a>
+    {%endfor%}
+    </div>
+    {%endif%}
+<script>
+  $('.url').click(function(e){
+    e.preventDefault();
+    var url = window.location;
+    var data ={'url':$(this).attr('value_id')}
+    $.ajax({
+      method:'GET',
+      url:url,
+      data:data,
+      success:function(res){
+      var _data = $.parseJSON(res.all);
+      var _user =$.parseJSON(res.user);
+      var _states =$.parseJSON(res.states);
+      $("#wrapper").html("");
+      $.each(_data,function(index,data){
+        $.each(_user,function(index,user_info){
+          if(user_info.fields.owner == data.fields.author){
+           var _html =` <div class="wrapper container-fluid" >
+               <div class="row">
+                 <div class="col-md-2">
+                   <div class="d-flex align-items-center justify-content-center">
+
+                     <img class="img-circle" src="media/`+user_info.fields.profile_pic+`" alt="">
+                   </div>
+                 </div>
+                 <div class="col-md-10">
+                   <div>
+                     <h4>`+data.fields.question_title+`</h4>
+                   </div>
+                   <p>`+data.fields.description+`</p>
+                   <p>`+data.fields.date+`</p>
+                 </div>
+               </div>
+             </div>`
+              $("#wrapper").append(`${_html}`)
+          }
+        })
+      })
+      console.log(_states.has_previous)
+      if(res.all_page > 8){
+      if (_states.has_previous) {
+        var Page =res.current_page - 1
+        $("#previous_page_add_butt").attr('value_id', Page)
+        $("#previous_page_add_butt").attr('class', "url")
+      }
+      else if(_states.has_previous === false){
+        $("#previous_page_add_butt").attr('class', "")
+      }
+      if (_states.has_next) {
+        var Page =res.current_page + 1
+        $("#last_page_add_butt").attr('value_id', Page)
+        $("#last_page_add_butt").attr('class', "last_page url")
+      }
+      else if(_states.has_next === false){
+        $("#last_page_add_butt").attr('class', "")
+      }
+      }
+      },
+      error:function(e){
+        console.log('error')
+        console.log(e)
+      }
+    })
+  })
+  $(".add_view").on("click",function(e){
+    var _url = $(this).attr("value_id")
+      $.ajax({
+        method:"GET",
+        url:_url,
+        success:function(res){
+          console.log('')
+        },
+        error:function(e){
+          console.log(e)
+        }
+      })
+  })
+</script>
+      <style>
+        .underline{
+          border-bottom:1px solid black;
+          width:100vw;
+          margin:0;
+          position:relative;
+        }
+        .img-circle{
+          border-radius:50px;
+          width:50px;
+          height:50px;
+          }
+        .all{
+          margin-bottom:10px;
+        }
+        .lonly{
+          display:none;
+        }
+        .wrapper{
+          margin-top:1%;
+        }
+      </style>
+<script>
+  var toggler =document.getElementsByClassName('togglerers');
+  toggler[0].addEventListener('click',function(){
+    document.getElementById('FilterCollapse').classList.toggle('lonly')
+  })
+</script>

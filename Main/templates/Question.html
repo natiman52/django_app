@@ -1,0 +1,41 @@
+{%extends 'base.html'%}
+{%load crispy_forms_tags%}
+{%block content%}
+
+{%for mass in messages%}
+<div class="bg-success" style="text-align:center;margin:0;">
+  <p class='text-white' style="margin-bottom:0;font-size:20px;">{{mass}}</p>
+</div>
+{%endfor%}
+{%include 'profile navbar.html'%}
+<div id="container" class="container">
+<form action="" method="POST">
+    {%csrf_token%}
+<div class="col-md-8 offset-md-2">
+{{form | crispy}}
+<div class="desc">
+    <label for="">{{form2.description.label}}*</label>
+ {{form2.description}}
+
+</div>
+<p style="font-size: 80%;color: #dc3545;">
+     <strong style="font-weight: bolder;">{{messag2 | safe}}</strong>
+ </p>
+{{form2.media}}
+<div class="d-flex justify-content-end">
+    <button class="btn btn-primary">Submit</button>
+</div>
+    </div>
+</form>
+</div>
+
+{%endblock%}
+{%block css%}
+<style>
+    #container{
+        margin-top:2%;
+    }
+
+</style>
+    {{messag |safe}}
+{%endblock%}
