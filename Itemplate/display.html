@@ -3,9 +3,11 @@
       {%if user.is_authenticated%}
       <div class="d-flex justify-content-end">
         <form action='{%url "main:Question"%}' method="GET">
-          <button  style="margin-top:30px;margin-bottom:15px;" class="btn btn-primary">ጥያቄ ጠይቅ</button>
+          <button  style="margin-top:30px;margin-bottom:15px;" class="btn btn-primary">Ask Question</button>
         </form>
       </div>
+      {%else%}
+      <div style="margin-bottom: 28px;"></div>
       {%endif%}
      <!-- '{url "main:Ask" }' -->
     </div>
@@ -21,7 +23,7 @@
         </div>
         <div class="col-md-10">
           <div>
-            <a class="add_view" value_id="{%url 'main:add_view' slug=al.slug %}" href="{%url 'main:List' id=al.slug %}"><h4>{{al.question_title}}</h4></a>
+            <a id="add_View" value_id="{%url 'main:add_view' slug=al.slug %}" href="{%url 'main:List' id=al.slug %}"><h4>{{al.question_title}}</h4></a>
           </div>
           <p>{{al.description|safe}}</p>
           <p>{{al.date}}</p>
@@ -35,8 +37,7 @@
       <a name="url" id="previous_page_add_butt" class="url" value_id="">previous_page</a>
     </div>
     {%for i in 9|iltreate_of_num %}
-
-    <a name="url" class="url" id="page_number" value_id="{{i}}">{{i}}</a>
+    <a name="url" class="url paginator_number_css" id="page_number" value_id="{{i}}">{{i}} </a>
     {%endfor%}
     <div class="last_page_add">
       <a name="url" id="last_page_add_butt" class="last_page url" value_id="2">Next page</a>
@@ -44,11 +45,14 @@
     {% else %}
     <div class="d-flex justify-content-center ">
     {%for i in paginator.page_range%}
-    <a style="padding: 3px;margin-bottom: 5px;" name="url" class="url" id="page_number" value_id="{{i}}">{{i}}</a>
+    <a style="padding: 3px;margin-bottom: 5px;" name="url" class="url paginator_number_css" id="page_number" value_id="{{i}}">{{i}}</a>
     {%endfor%}
     </div>
     {%endif%}
 <script>
+  $(document).ready(function(){
+    add_view()
+  })
   $('.url').click(function(e){
     e.preventDefault();
     var url = window.location;
@@ -63,19 +67,24 @@
       var _states =$.parseJSON(res.states);
       $("#wrapper").html("");
       $.each(_data,function(index,data){
+        var link = `/Question/${data.fields.slug}`
+        var link2 = `/add_view/${data.fields.slug}`
         $.each(_user,function(index,user_info){
+          var link3 = `media/${user_info.fields.profile_pic}`
+          console.log(data.fields)
           if(user_info.fields.owner == data.fields.author){
+
            var _html =` <div class="wrapper container-fluid" >
                <div class="row">
                  <div class="col-md-2">
                    <div class="d-flex align-items-center justify-content-center">
 
-                     <img class="img-circle" src="media/`+user_info.fields.profile_pic+`" alt="">
+                     <img class="img-circle" src=${link3} alt="">
                    </div>
                  </div>
                  <div class="col-md-10">
                    <div>
-                     <h4>`+data.fields.question_title+`</h4>
+            <a class="add_view" id="add_View" value_id='${link2}' href="${link}"><h4>`+data.fields.question_title+`</h4></a>
                    </div>
                    <p>`+data.fields.description+`</p>
                    <p>`+data.fields.date+`</p>
@@ -83,6 +92,7 @@
                </div>
              </div>`
               $("#wrapper").append(`${_html}`)
+              add_view()
           }
         })
       })
@@ -112,19 +122,21 @@
       }
     })
   })
-  $(".add_view").on("click",function(e){
-    var _url = $(this).attr("value_id")
-      $.ajax({
-        method:"GET",
-        url:_url,
-        success:function(res){
-          console.log('')
-        },
-        error:function(e){
-          console.log(e)
-        }
-      })
-  })
+  function add_view(){
+    $('#add_View').on("click",function (e) {
+      var _url = $(this).attr("value_id")
+        $.ajax({
+          method:"GET",
+          url:_url,
+          success:function(res){
+            console.log('')
+          },
+          error:function(e){
+            console.log(e)
+          }
+        })
+    })
+  }
 </script>
       <style>
         .underline{
@@ -146,6 +158,10 @@
         }
         .wrapper{
           margin-top:1%;
+        }
+        .paginator_number_css{
+          cursor: pointer;
+          margin-left: 10px;
         }
       </style>
 <script>

@@ -48,23 +48,25 @@ def home(request):
         five = reversed(question2[len(question2)-5:len(question2)])
     except AssertionError:
         five = question
-    boom =[querysets.objects.all()[0]]
-    for ques in querysets.objects.all():
-        if len(boom) > 3 :
-            length = -3
-        elif len(boom) > 2:
-            length = -2
-        else:
-            length = -1
-        if ques.profile.followers.count() >= boom[length].profile.followers.count():
-            if ques in boom:
-                pass
+    fifth = []
+    if( querysets.objects.all() ):
+        boom =[querysets.objects.all()[0]]
+        for ques in querysets.objects.all():
+            if len(boom) > 3 :
+                length = -3
+            elif len(boom) > 2:
+                length = -2
             else:
-                boom.append(ques)
-    try:
-        fifth =reversed(boom[len(boom)-8:len(boom)])
-    except AssertionError:
-        fifth =reversed(boom)
+                length = -1
+            if ques.profile.followers.count() >= boom[length].profile.followers.count():
+                if ques in boom:
+                    pass
+                else:
+                    boom.append(ques)
+        try:
+            fifth =reversed(boom[len(boom)-8:len(boom)])
+        except AssertionError:
+            fifth =reversed(boom)
     return render(request,'index.html',
     {'form':cont,'all':question,'five':five,'question':Question,'boom':fifth,"paginator":paginator,"current_page":current_page}
     )

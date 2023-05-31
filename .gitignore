@@ -3,3 +3,4 @@ migrations/
 *.log
 *.pyc
 *.pyo
+__init__*
